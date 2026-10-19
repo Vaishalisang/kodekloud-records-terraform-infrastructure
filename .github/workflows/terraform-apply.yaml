@@ -38,14 +38,6 @@ jobs:
           aws s3api get-bucket-location \
             --bucket terraform-state-code-file \
             --region eu-west-2
-
-      - name: Check S3 State Access
-        run: |
-          aws s3api head-object \
-            --bucket terraform-state-code-file \
-            --key global/terraform.tfstate \
-            --region eu-west-2
-
       - name: Terraform Init
         run: terraform init -reconfigure
 
