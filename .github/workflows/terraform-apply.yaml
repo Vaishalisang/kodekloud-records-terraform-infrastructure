@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   terraform:
-    name: Terraform Apply
+    name: Terraform Diagnostics
     runs-on: ubuntu-latest
 
     permissions:
