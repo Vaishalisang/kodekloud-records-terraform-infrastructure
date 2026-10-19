@@ -1,0 +1,70 @@
+name: Terraform Import IAM Users
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-state-dev
+  cancel-in-progress: false
+
+jobs:
+  import:
+    name: Import Existing IAM Users
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+
+      - name: Terraform Init
+        run: terraform init -reconfigure -input=false
+
+      - name: Show Current State
+        run: terraform state list
+
+      - name: Import Julia
+        shell: bash
+        run: |
+          ADDRESS='module.iam_users.aws_iam_user.new_users["iamuser-julia"]'
+
+          if terraform state list | grep -Fxq "$ADDRESS"; then
+            echo "Julia already tracked; skipping."
+          else
+            terraform import -input=false "$ADDRESS" iamuser-julia
+          fi
+
+      - name: Import Pablo
+        shell: bash
+        run: |
+          ADDRESS='module.iam_users.aws_iam_user.new_users["iamuser-pablo"]'
+
+          if terraform state list | grep -Fxq "$ADDRESS"; then
+            echo "Pablo already tracked; skipping."
+          else
+            terraform import -input=false "$ADDRESS" iamuser-pablo
+          fi
+
+      - name: Verify Imported State
+        run: terraform state list
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -no-color
