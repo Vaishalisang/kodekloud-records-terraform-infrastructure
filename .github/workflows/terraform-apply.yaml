@@ -42,6 +42,9 @@ jobs:
       - name: Terraform Init
         run: terraform init -reconfigure
 
+      - name: Verify Terraform State
+        run: terraform state list
+
       - name: Terraform Validate
         run: terraform validate
 
@@ -54,5 +57,5 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -input=false -out=tfplan
 
-      - name: Terraform Apply
-        run: terraform apply -input=false tfplan
+#- name: Terraform Apply
+# run: terraform apply -input=false tfplan
