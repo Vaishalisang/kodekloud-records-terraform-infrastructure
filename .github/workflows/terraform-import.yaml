@@ -60,11 +60,22 @@ jobs:
             terraform import -input=false "$ADDRESS" iamuser-pablo
           fi
 
+      - name: Import Existing S3 Lab Bucket
+        shell: bash
+        run: |
+          ADDRESS='aws_s3_bucket.terraform_state'
+
+          if terraform state list | grep -Fxq "$ADDRESS"; then
+            echo "S3 bucket already tracked; skipping."
+          else
+            terraform import -input=false "$ADDRESS" terraform-state-2527a9a1
+          fi
+
       - name: Verify Imported State
         run: terraform state list
 
       - name: Terraform Validate
         run: terraform validate
-
+        
       - name: Terraform Plan
         run: terraform plan -input=false -no-color
