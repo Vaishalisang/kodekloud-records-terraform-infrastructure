@@ -38,24 +38,46 @@ jobs:
           aws s3api get-bucket-location \
             --bucket terraform-state-code-file \
             --region eu-west-2
-
+            
       - name: Terraform Init
         run: terraform init -reconfigure
-
-      - name: Verify Terraform State
-        run: terraform state list
 
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Show Terraform Plan
+        run: terraform show -no-color tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -input=false tfplan
+
       - name: Verify Terraform State
         run: terraform state list
 
-      - name: Terraform Plan
-        run: terraform plan -no-color
+      - name: Verify Final Plan
+        run: terraform plan -input=false -no-color
 
-      - name: Terraform Plan
-        run: terraform plan -input=false -out=tfplan
+
+     # - name: Terraform Init
+     #   run: terraform init -reconfigure
+
+      #- name: Verify Terraform State
+      #  run: terraform state list
+
+      #- name: Terraform Validate
+     #   run: terraform validate
+
+     #- name: Verify Terraform State
+     #   run: terraform state list
+
+      #- name: Terraform Plan
+     #  run: terraform plan -no-color
+
+      #- name: Terraform Plan
+      #  run: terraform plan -input=false -out=tfplan
 
 #- name: Terraform Apply
 # run: terraform apply -input=false tfplan
